@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">EventMaster</string>
+    <string name="app_name">Event Master</string>
+    <string name="title_home">EVENT MASTER</string>
+    <string name="add_event">Añadir Evento</string>
+    <string name="no_events">No hay eventos registrados</string>
+    <string name="new_event">Nuevo Registro</string>
+    <string name="edit_event">Editar Evento</string>
+    <string name="back">Volver</string>
+    <string name="event_name">Nombre del Evento</string>
+    <string name="required_field">Campo obligatorio</string>
+    <string name="date_label">Fecha:</string>
+    <string name="select_date">Seleccionar Fecha</string>
+    <string name="location_label">Ubicación</string>
+    <string name="description_label">Descripción / Detalles</string>
+    <string name="category_label">Categoría:</string>
+    <string name="select_category">Seleccionar Categoría</string>
+    <string name="save_event">GUARDAR EVENTO</string>
+    <string name="update_event">ACTUALIZAR EVENTO</string>
+    <string name="validation_error">Error: Selecciona categoría y completa campos</string>
+    <string name="detail_title">Detalle</string>
+    <string name="edit">Editar</string>
+    <string name="location_prefix">Ubicación</string>
+    <string name="date_prefix">Fecha</string>
+    <string name="category_prefix">Categoría</string>
+    <string name="details_section">Detalles del Evento</string>
+    <string name="add_category">Nueva Categoría</string>
+    <string name="category_name">Nombre de la categoría</string>
+    <string name="cancel">Cancelar</string>
+    <string name="create">Crear</string>
+    <string name="select_image">Seleccionar Imagen</string>
+    <string name="change_image">Cambiar Imagen</string>
 </resources>

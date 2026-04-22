@@ -55,4 +55,12 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Para la Navegación
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    // Para el ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    // Para los iconos
+    implementation("androidx.compose.material:material-icons-extended")
+    // Para cargar imágenes
+    implementation(libs.coil.compose)
 }
