@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Label
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +27,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -34,13 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-
+import androidx.compose.ui.graphics.vector.ImageVector
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +66,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun EventMasterApp() {
     val navController = rememberNavController()
-    val eventViewModel: EventViewModel = viewModel()
+    val eventViewModel: EventViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = "home") {
-
         composable("home") {
             var showCategoryDialog by remember { mutableStateOf(false) }
             var newCategoryName by remember { mutableStateOf("") }
@@ -104,16 +105,16 @@ fun EventMasterApp() {
             Scaffold(
                 topBar = {
                     CenterAlignedTopAppBar(
-                        title = { 
+                        title = {
                             Text(
-                                stringResource(R.string.title_home), 
+                                stringResource(R.string.title_home),
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
-                            ) 
+                            )
                         },
                         actions = {
                             IconButton(onClick = { showCategoryDialog = true }) {
-                                Icon(Icons.Rounded.Category, contentDescription = stringResource(R.string.add_category), tint = Color(0xFFFFD700))
+                                Icon(Icons.Rounded.Category, contentDescription = null, tint = Color(0xFFFFD700))
                             }
                         }
                     )
@@ -125,7 +126,7 @@ fun EventMasterApp() {
                         contentColor = Color(0xFF051423),
                         shape = RoundedCornerShape(16.dp)
                     ) {
-                        Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.add_event), modifier = Modifier.size(32.dp))
+                        Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(32.dp))
                     }
                 }
             ) { padding ->
@@ -141,7 +142,7 @@ fun EventMasterApp() {
                                 ).padding(12.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Rounded.Label, null, tint = Color(0xFF102A43))
+                                Icon(Icons.AutoMirrored.Rounded.Label, null, tint = Color(0xFF102A43))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(category, color = Color(0xFF102A43), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold)
                             }
@@ -162,10 +163,10 @@ fun EventMasterApp() {
 
         composable(
             "add_event?eventId={eventId}",
-            arguments = listOf(navArgument("eventId") { 
+            arguments = listOf(navArgument("eventId") {
                 type = NavType.StringType
                 nullable = true
-                defaultValue = null 
+                defaultValue = null
             })
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId")
@@ -177,10 +178,10 @@ fun EventMasterApp() {
             var description by remember { mutableStateOf(existingEvent?.description ?: "") }
             var selectedCategory by remember { mutableStateOf(existingEvent?.category ?: "") }
             var selectedImageUri by remember { mutableStateOf<Uri?>(existingEvent?.imageUri?.let { Uri.parse(it) }) }
-            
-            var scale by remember { mutableStateOf(existingEvent?.imageScale ?: 1f) }
+
+            var scale by remember { mutableFloatStateOf(existingEvent?.imageScale ?: 1f) }
             var offset by remember { mutableStateOf(Offset(existingEvent?.imageOffsetX ?: 0f, existingEvent?.imageOffsetY ?: 0f)) }
-            
+
             var expanded by remember { mutableStateOf(false) }
             var showError by remember { mutableStateOf(false) }
 
@@ -208,14 +209,14 @@ fun EventMasterApp() {
                         title = { Text(if (existingEvent == null) stringResource(R.string.new_event) else stringResource(R.string.edit_event), fontWeight = FontWeight.Bold) },
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Rounded.ArrowBackIosNew, contentDescription = stringResource(R.string.back))
+                                Icon(Icons.Rounded.ArrowBackIosNew, contentDescription = null)
                             }
                         }
                     )
                 }
             ) { padding ->
                 Column(modifier = Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState())) {
-                    
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -245,7 +246,7 @@ fun EventMasterApp() {
                                 contentScale = ContentScale.Fit
                             )
                         }
-                        
+
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -269,23 +270,14 @@ fun EventMasterApp() {
                             }
                         }
                     }
-                    
-                    if (selectedImageUri != null) {
-                        Text(
-                            "Ajusta con dos dedos para encuadrar",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),
-                            color = Color(0xFFFFD700).copy(alpha = 0.7f)
-                        )
-                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     EventInputField(
-                        value = title, 
-                        onValueChange = { title = it }, 
-                        label = stringResource(R.string.event_name), 
-                        isError = showError && title.isBlank(), 
+                        value = title,
+                        onValueChange = { title = it },
+                        label = stringResource(R.string.event_name),
+                        isError = showError && title.isBlank(),
                         errorMessage = stringResource(R.string.required_field)
                     )
 
@@ -304,10 +296,10 @@ fun EventMasterApp() {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     EventInputField(
-                        value = location, 
-                        onValueChange = { location = it }, 
-                        label = stringResource(R.string.location_label), 
-                        isError = showError && location.isBlank(), 
+                        value = location,
+                        onValueChange = { location = it },
+                        label = stringResource(R.string.location_label),
+                        isError = showError && location.isBlank(),
                         errorMessage = stringResource(R.string.required_field)
                     )
 
@@ -323,13 +315,13 @@ fun EventMasterApp() {
 
                     Box(modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(
-                            onClick = { expanded = true }, 
+                            onClick = { expanded = true },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(Icons.Rounded.Style, null, tint = Color(0xFFFFD700))
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(if (selectedCategory.isEmpty()) stringResource(R.string.select_category) else selectedCategory)
+                            Text(selectedCategory.ifEmpty { stringResource(R.string.select_category) })
                             Spacer(modifier = Modifier.weight(1f))
                             Icon(Icons.Rounded.ArrowDropDown, null)
                         }
@@ -373,12 +365,11 @@ fun EventMasterApp() {
                                 Toast.makeText(context, context.getString(R.string.validation_error), Toast.LENGTH_SHORT).show()
                             }
                         }
-                    ) { 
+                    ) {
                         Text(
                             if (existingEvent == null) stringResource(R.string.save_event) else stringResource(R.string.update_event),
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        ) 
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -397,86 +388,62 @@ fun EventMasterApp() {
                         title = { Text(stringResource(R.string.detail_title), fontWeight = FontWeight.Bold) },
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Rounded.ArrowBackIosNew, contentDescription = stringResource(R.string.back))
+                                Icon(Icons.Rounded.ArrowBackIosNew, contentDescription = null)
                             }
                         },
                         actions = {
-                            IconButton(onClick = { 
-                                navController.navigate("add_event?eventId=${event?.id}") 
+                            IconButton(onClick = {
+                                navController.navigate("add_event?eventId=${event?.id}")
                             }) {
-                                Icon(Icons.Rounded.EditNote, contentDescription = stringResource(R.string.edit), tint = Color(0xFFFFD700), modifier = Modifier.size(32.dp))
+                                Icon(Icons.Rounded.EditNote, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(32.dp))
                             }
                         }
                     )
                 }
             ) { padding ->
-                Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .background(Color(0xFF102A43))
-                            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (event?.imageUri != null) {
-                            AsyncImage(
-                                model = event.imageUri,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .graphicsLayer(
-                                        scaleX = event.imageScale,
-                                        scaleY = event.imageScale,
-                                        translationX = event.imageOffsetX,
-                                        translationY = event.imageOffsetY
-                                    ),
-                                contentScale = ContentScale.Fit
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Rounded.EventAvailable,
-                                contentDescription = null,
-                                modifier = Modifier.size(120.dp),
-                                tint = Color(0xFFFFD700).copy(alpha = 0.5f)
-                            )
-                        }
-                    }
-
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(
-                            text = event?.title ?: "", 
-                            style = MaterialTheme.typography.headlineLarge, 
-                            color = Color(0xFFFFD700), 
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        DetailItem(Icons.Rounded.Place, stringResource(R.string.location_prefix), event?.location ?: "")
-                        DetailItem(Icons.Rounded.Event, stringResource(R.string.date_prefix), event?.date ?: "")
-                        DetailItem(Icons.Rounded.Loyalty, stringResource(R.string.category_prefix), event?.category ?: "")
-                        
-                        if (!event?.description.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(32.dp))
-                            Text(
-                                stringResource(R.string.details_section), 
-                                style = MaterialTheme.typography.titleMedium, 
-                                color = Color(0xFFFFD700),
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Surface(
-                                color = Color.White.copy(alpha = 0.05f),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = event?.description ?: "", 
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(16.dp),
-                                    lineHeight = 22.sp
+                if (event != null) {
+                    Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .background(Color(0xFF102A43))
+                                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (event.imageUri != null) {
+                                AsyncImage(
+                                    model = event.imageUri,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .graphicsLayer(
+                                            scaleX = event.imageScale,
+                                            scaleY = event.imageScale,
+                                            translationX = event.imageOffsetX,
+                                            translationY = event.imageOffsetY
+                                        ),
+                                    contentScale = ContentScale.Fit
                                 )
+                            } else {
+                                Icon(Icons.Rounded.EventAvailable, null, modifier = Modifier.size(120.dp), tint = Color(0xFFFFD700).copy(alpha = 0.5f))
+                            }
+                        }
+
+                        Column(modifier = Modifier.padding(24.dp)) {
+                            Text(text = event.title, style = MaterialTheme.typography.headlineLarge, color = Color(0xFFFFD700), fontWeight = FontWeight.ExtraBold)
+                            Spacer(modifier = Modifier.height(24.dp))
+                            DetailItem(Icons.Rounded.Place, stringResource(R.string.location_prefix), event.location)
+                            DetailItem(Icons.Rounded.Event, stringResource(R.string.date_prefix), event.date)
+                            DetailItem(Icons.Rounded.Loyalty, stringResource(R.string.category_prefix), event.category)
+
+                            if (event.description.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(32.dp))
+                                Text(stringResource(R.string.details_section), style = MaterialTheme.typography.titleMedium, color = Color(0xFFFFD700), fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Surface(color = Color.White.copy(alpha = 0.05f), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = event.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(16.dp))
+                                }
                             }
                         }
                     }
@@ -485,7 +452,6 @@ fun EventMasterApp() {
         }
     }
 }
-
 @Composable
 fun DetailItem(icon: ImageVector, label: String, value: String) {
     Row(
